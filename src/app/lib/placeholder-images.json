@@ -1,0 +1,17 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-epidemic",
+      "description": "Medical data visualization dashboard",
+      "imageUrl": "https://picsum.photos/seed/epiguard/1200/600",
+      "imageHint": "medical data visualization"
+    },
+    {
+      "id": "landing-hero",
+      "description": "Futuristic AI health surveillance concept",
+      "imageUrl": "https://picsum.photos/seed/ai-health/1920/1080",
+      "imageHint": "futuristic healthcare"
+    }
+  ]
+}

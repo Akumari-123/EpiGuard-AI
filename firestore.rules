@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * EPI-GUARD AI SECURITY RULES
+     * 
+     * Core Philosophy:
+     * This ruleset implements a "Public Read / Admin Write" security model. It is designed 
+     * for a public health dashboard where data consumption is open to everyone (including 
+     * anonymous users), but data modification is strictly restricted to verified 
+     * administrative accounts.
+     * 
+     * Data Structure:
+     * - Top-level collections: /regions, /insights, and /roles_admin.
+     * - Regional data (epidemiological records and AI predictions) are stored as subcollections 
+     *   under their respective /regions/{regionId} documents to optimize geographic queries.
+     * 
+     * Key Security Decisions:
+     * - Global Read Access: All epidemiological data, predictions, and insights are publicly 
+     *   readable (get and list) to allow for unauthenticated dashboard access.
+     * - Role-Based Access Control (RBAC): Write access is authorized via a look-up in the 
+     *   /roles_admin collection. If a user's UID exists as a document ID in that collection, 
+     *   they are granted write permissions across the application data.
+     * - Relational Integrity: For subcollections, rules enforce that the internal 'regionId' 
+     *   field matches the actual Firestore path segment to prevent data cross-contamination.
+     * - Prototyping Flexibility: While authorization is strictly enforced, these rules 
+     *   do not perform deep schema or data-type validation to allow for rapid iteration 
+     *   of the AI models and data structures.
+     */
+
+    // --- GLOBAL HELPER FUNCTIONS ---
+
+    /** 
+     * @description Checks if the user is authenticated with Firebase.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** 
+     * @description Checks if the authenticated user is registered in the administrative roles collection.
+     */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /** 
+     * @description Verifies the user is an admin and the document being modified/deleted exists.
+     */
+    function isExistingAdmin() {
+      return isAdmin() && resource != null;
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for the Region collection. Public read, admin-only write.
+     * @path /regions/{regionId}
+     * @allow get, list: if true; (Any user can view regions)
+     * @allow create: if isAdmin() && request.resource.data.id == regionId; (Admin creates with matching ID)
+     * @deny update: if !isAdmin() || request.resource.data.id != resource.data.id; (Prevents ID modification)
+     * @principle Public consumption with administrative data management.
+     */
+    match /regions/{regionId} {
+      allow get, list: if true;
+      allow create: if isAdmin() && request.resource.data.id == regionId;
+      allow update: if isExistingAdmin() && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingAdmin();
+
+      /**
+       * @description Historical records for a region. Enforces path consistency.
+       * @path /regions/{regionId}/epidemiologicalRecords/{recordId}
+       * @allow create: if isAdmin() && request.resource.data.regionId == regionId; (Consistency check)
+       * @principle Relational integrity between path and internal document fields.
+       */
+      match /epidemiologicalRecords/{recordId} {
+        allow get, list: if true;
+        allow create: if isAdmin() && request.resource.data.regionId == regionId;
+        allow update: if isExistingAdmin() && request.resource.data.regionId == resource.data.regionId;
+        allow delete: if isExistingAdmin();
+      }
+
+      /**
+       * @description AI-generated predictions for a specific region.
+       * @path /regions/{regionId}/predictions/{predictionId}
+       * @allow list: if true; (Public can see all predictions for a region)
+       * @principle Logical grouping of AI outputs by geographic context.
+       */
+      match /predictions/{predictionId} {
+        allow get, list: if true;
+        allow create: if isAdmin() && request.resource.data.regionId == regionId;
+        allow update: if isExistingAdmin() && request.resource.data.regionId == resource.data.regionId;
+        allow delete: if isExistingAdmin();
+      }
+    }
+
+    /**
+     * @description AI-generated analytical insights. Can be global or regional.
+     * @path /insights/{insightId}
+     * @allow get, list: if true;
+     * @allow update: if isExistingAdmin(); (Admins can refine insights)
+     * @principle Centralized repository for high-level epidemiological analysis.
+     */
+    match /insights/{insightId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isExistingAdmin();
+      allow delete: if isExistingAdmin();
+    }
+
+    /**
+     * @description Access control configuration. Managed externally/manually.
+     * @path /roles_admin/{adminUid}
+     * @allow get: if isSignedIn() && (request.auth.uid == adminUid || isAdmin()); (Self or existing admin check)
+     * @deny list: if true; (Prevent listing all administrative accounts)
+     * @deny create, update, delete: if true; (Managed by super-admin/Firebase Console for security)
+     * @principle Database Access Control (DBAC) through a restricted metadata collection.
+     */
+    match /roles_admin/{adminUid} {
+      allow get: if isSignedIn() && (request.auth.uid == adminUid || isAdmin());
+      allow list: if false;
+      allow create, update, delete: if false; // Managed by backend service or manual console entry
+    }
+  }
+}

@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 221 39% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 221 39% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39% 11%;
+    --primary: 224 64% 33%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 188 94% 43%;
+    --secondary-foreground: 221 39% 11%;
+    --muted: 214 32% 91%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 263 91% 71%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 224 64% 33%;
+    --radius: 1.25rem;
+    
+    --low-risk: 142 71% 45%;
+    --medium-risk: 45 93% 47%;
+    --high-risk: 0 84% 60%;
+    --graph: 199 89% 48%;
+
+    --chart-1: 224 64% 33%;
+    --chart-2: 188 94% 43%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 45 93% 47%;
+    --chart-5: 199 89% 48%;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 11%;
+    --card-foreground: 213 31% 91%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 215 20.2% 65.1%;
+    --primary: 188 94% 43%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 263 91% 71%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 64% 33%;
+    
+    --low-risk: 142 71% 45%;
+    --medium-risk: 45 93% 47%;
+    --high-risk: 0 84% 60%;
+    --graph: 199 89% 48%;
+
+    --chart-1: 188 94% 43%;
+    --chart-2: 263 91% 71%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased transition-colors duration-300;
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+  }
+}
+
+.glass-card {
+  @apply bg-card/80 backdrop-blur-md border border-border shadow-lg;
+}
+
+.neon-glow-primary {
+  box-shadow: 0 0 15px -3px rgba(30, 58, 138, 0.2);
+}
+
+.dark .neon-glow-primary {
+  box-shadow: 0 0 20px -5px rgba(34, 211, 238, 0.4);
+}

@@ -1,0 +1,315 @@
+{
+  "entities": {
+    "Region": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Region",
+      "type": "object",
+      "description": "Represents a geographical region (country, state, province) for which epidemiological data is collected and predictions are made.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Region entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The common name of the region (e.g., 'United States', 'California')."
+        },
+        "isoCode": {
+          "type": "string",
+          "description": "Standard ISO 3166-1 alpha-2 or similar code for the region (e.g., 'US', 'US-CA')."
+        },
+        "latitude": {
+          "type": "number",
+          "description": "The latitude coordinate for the central point of the region, used for map visualization."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "The longitude coordinate for the central point of the region, used for map visualization."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "isoCode",
+        "latitude",
+        "longitude"
+      ]
+    },
+    "EpidemiologicalRecord": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "EpidemiologicalRecord",
+      "type": "object",
+      "description": "Stores daily aggregated epidemiological and related data for a specific region, integrating information from various sources like Johns Hopkins, Our World in Data, and Google Mobility.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the EpidemiologicalRecord entity."
+        },
+        "regionId": {
+          "type": "string",
+          "description": "Reference to the Region this record belongs to. (Relationship: Region 1:N EpidemiologicalRecord)"
+        },
+        "recordDate": {
+          "type": "string",
+          "description": "The specific date for which this epidemiological data is recorded.",
+          "format": "date-time"
+        },
+        "totalCases": {
+          "type": "number",
+          "description": "The cumulative total number of confirmed cases up to this date."
+        },
+        "newCases": {
+          "type": "number",
+          "description": "The number of new confirmed cases reported on this date."
+        },
+        "totalDeaths": {
+          "type": "number",
+          "description": "The cumulative total number of deaths up to this date."
+        },
+        "newDeaths": {
+          "type": "number",
+          "description": "The number of new deaths reported on this date."
+        },
+        "totalRecovered": {
+          "type": "number",
+          "description": "The cumulative total number of recovered individuals up to this date."
+        },
+        "newRecovered": {
+          "type": "number",
+          "description": "The number of new recovered individuals reported on this date."
+        },
+        "totalVaccinations": {
+          "type": "number",
+          "description": "The cumulative total number of vaccine doses administered up to this date (optional, from Our World in Data)."
+        },
+        "peopleVaccinated": {
+          "type": "number",
+          "description": "The cumulative total number of people who have received at least one vaccine dose up to this date (optional, from Our World in Data)."
+        },
+        "peopleFullyVaccinated": {
+          "type": "number",
+          "description": "The cumulative total number of people who are fully vaccinated up to this date (optional, from Our World in Data)."
+        },
+        "mobilityRetailRecreationChange": {
+          "type": "number",
+          "description": "Percentage change in mobility for retail and recreation places compared to a baseline (optional, from Google Mobility)."
+        },
+        "mobilityGroceryPharmacyChange": {
+          "type": "number",
+          "description": "Percentage change in mobility for grocery and pharmacy places compared to a baseline (optional, from Google Mobility)."
+        },
+        "mobilityParksChange": {
+          "type": "number",
+          "description": "Percentage change in mobility for parks compared to a baseline (optional, from Google Mobility)."
+        },
+        "mobilityTransitStationsChange": {
+          "type": "number",
+          "description": "Percentage change in mobility for transit stations compared to a baseline (optional, from Google Mobility)."
+        },
+        "mobilityWorkplacesChange": {
+          "type": "number",
+          "description": "Percentage change in mobility for workplaces compared to a baseline (optional, from Google Mobility)."
+        },
+        "mobilityResidentialChange": {
+          "type": "number",
+          "description": "Percentage change in mobility for residential areas compared to a baseline (optional, from Google Mobility)."
+        }
+      },
+      "required": [
+        "id",
+        "regionId",
+        "recordDate",
+        "totalCases",
+        "newCases",
+        "totalDeaths",
+        "newDeaths",
+        "totalRecovered",
+        "newRecovered"
+      ]
+    },
+    "Prediction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Prediction",
+      "type": "object",
+      "description": "Stores the results of an AI-powered epidemic prediction for a specific region and future date.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Prediction entity."
+        },
+        "regionId": {
+          "type": "string",
+          "description": "Reference to the Region for which this prediction was made. (Relationship: Region 1:N Prediction)"
+        },
+        "predictionDate": {
+          "type": "string",
+          "description": "The future date for which the case count is predicted.",
+          "format": "date-time"
+        },
+        "predictedCases": {
+          "type": "number",
+          "description": "The forecasted number of active cases for the prediction date."
+        },
+        "riskLevel": {
+          "type": "string",
+          "description": "The calculated risk level for the region on the prediction date (Low, Medium, High)."
+        },
+        "predictionTimestamp": {
+          "type": "string",
+          "description": "The timestamp when this prediction was generated.",
+          "format": "date-time"
+        },
+        "modelVersion": {
+          "type": "string",
+          "description": "Identifier for the AI/ML model version used to generate this prediction (e.g., 'LSTM-v1.2')."
+        }
+      },
+      "required": [
+        "id",
+        "regionId",
+        "predictionDate",
+        "predictedCases",
+        "riskLevel",
+        "predictionTimestamp",
+        "modelVersion"
+      ]
+    },
+    "Insight": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Insight",
+      "type": "object",
+      "description": "Stores AI-generated analytical insights regarding epidemiological trends, factors, and anomalies.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Insight entity."
+        },
+        "regionId": {
+          "type": "string",
+          "description": "Reference to the Region this insight is about. Can be null for global insights. (Relationship: Region 0..1:N Insight)"
+        },
+        "insightDate": {
+          "type": "string",
+          "description": "The date when this insight was generated or is most relevant.",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "description": "The category or type of insight (e.g., 'Mobility Impact', 'Vaccination Effect', 'Trend Analysis', 'Anomaly Detection')."
+        },
+        "summary": {
+          "type": "string",
+          "description": "A brief summary of the insight."
+        },
+        "details": {
+          "type": "string",
+          "description": "The full, detailed content of the insight."
+        },
+        "relatedPredictionId": {
+          "type": "string",
+          "description": "Optional reference to a specific Prediction entity if this insight is directly related to it. (Relationship: Prediction 0..1:N Insight)"
+        }
+      },
+      "required": [
+        "id",
+        "insightDate",
+        "type",
+        "summary",
+        "details"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/regions/{regionId}",
+        "definition": {
+          "entityName": "Region",
+          "schema": {
+            "$ref": "#/backend/entities/Region"
+          },
+          "description": "Stores metadata for geographical regions (countries, states). This collection is publicly readable for dashboard display and administrator writable for data management."
+        }
+      },
+      {
+        "path": "/regions/{regionId}/epidemiologicalRecords/{recordId}",
+        "definition": {
+          "entityName": "EpidemiologicalRecord",
+          "schema": {
+            "$ref": "#/backend/entities/EpidemiologicalRecord"
+          },
+          "description": "Contains daily epidemiological and related data for a specific region. This subcollection is publicly readable and administrator writable. The document's 'regionId' field must match the path's '{regionId}' for data integrity.",
+          "params": [
+            {
+              "name": "regionId",
+              "description": "The unique identifier of the parent Region."
+            },
+            {
+              "name": "recordId",
+              "description": "The unique identifier for the epidemiological record."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/regions/{regionId}/predictions/{predictionId}",
+        "definition": {
+          "entityName": "Prediction",
+          "schema": {
+            "$ref": "#/backend/entities/Prediction"
+          },
+          "description": "Stores AI-generated epidemic predictions for a specific region and future date. This subcollection is publicly readable and administrator writable. The document's 'regionId' field must match the path's '{regionId}' for data integrity.",
+          "params": [
+            {
+              "name": "regionId",
+              "description": "The unique identifier of the parent Region."
+            },
+            {
+              "name": "predictionId",
+              "description": "The unique identifier for the prediction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/insights/{insightId}",
+        "definition": {
+          "entityName": "Insight",
+          "schema": {
+            "$ref": "#/backend/entities/Insight"
+          },
+          "description": "Stores AI-generated analytical insights, which can be global or associated with a specific region (via an optional 'regionId' field). This collection is publicly readable and administrator writable.",
+          "params": [
+            {
+              "name": "insightId",
+              "description": "The unique identifier for the insight."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{adminUid}",
+        "definition": {
+          "entityName": "admin",
+          "schema": {
+            "$ref": "#/backend/entities/user"
+          },
+          "description": "A collection used for Database Access Control (DBAC). The existence of a document with a user's UID here grants them administrative privileges for write operations across the application data. This collection is typically managed by a super-admin or service account, with very restricted read/write access.",
+          "params": [
+            {
+              "name": "adminUid",
+              "description": "The unique Firebase Authentication UID of an administrator."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for 'EpiGuard AI' prioritizes secure, scalable, and debuggable access based on a public read / admin write model. \n\n**Authorization Independence:** Given that the core data (Regions, EpidemiologicalRecords, Predictions, Insights) is designed for public read access, the authorization context for reading is global. Therefore, there's no need to denormalize parent-specific access control attributes (like `ownerId` or `members` maps) into subcollection documents to determine read permissions. All users, authenticated or unauthenticated, can read this data. Write access is controlled by a top-level administrative role system (`/roles_admin/{adminUid}`). This completely decouples write authorization from any data hierarchy, ensuring write operations are atomic and authorization rules are simple (e.g., `allow write: exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))`). The `regionId` field within subcollection documents (`epidemiologicalRecords`, `predictions`) is primarily for data integrity and logical grouping, ensuring the document's `regionId` matches its path segment, rather than for authorization purposes.\n\n**QAPs (Queries as Authorization Predictors):** For read operations, since all primary data collections are publicly readable, `list` queries are inherently secure. Any user can perform `list` operations on `/regions`, `/regions/{regionId}/epidemiologicalRecords`, `/regions/{regionId}/predictions`, and `/insights` without complex filtering by security rules. The rules simply grant `read` access universally. This enables efficient querying for the dashboard UI without requiring complex, potentially inefficient rule-based filtering. For write operations, the presence of `request.auth.uid` in the `/roles_admin` collection acts as the authorization predictor, ensuring only designated administrators can modify data.\n\n**Structural Segregation:** Collections like `/regions` house only region entities, and `/insights` houses insights. Subcollections like `/regions/{regionId}/epidemiologicalRecords` and `/regions/{regionId}/predictions` ensure that all documents within them share the exact same security posture (public read / admin write), simplifying rule definitions and preventing mixed-access data within a single collection. Global insights are distinguished from regional ones by an optional `regionId` field in the `/insights` collection, rather than creating separate subcollections for global insights, striking a balance between segregation and queryability.\n\n**Access Modeling & Consistency:**\n*   **Global Entities:** `regions` and `insights` are top-level collections for global entities or entities that can be global (like insights).\n*   **Hierarchical & Related Data:** `epidemiologicalRecords` and `predictions` are structured as subcollections under `regions` to logically group data and optimize queries for region-specific information (e.g., getting all historical records for a given region).\n*   **DBAC:** Admin roles are managed via a dedicated top-level collection (`/roles_admin`), enabling simple existence checks in security rules to grant administrative privileges.\n\nThis design ensures clarity, maintainability, and robust security for 'EpiGuard AI'."
+  }
+}

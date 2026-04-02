@@ -1,0 +1,10 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-epidemic",
+      "description": "Medical data visualization dashboard",
+      "imageUrl": "https://picsum.photos/seed/epiguard/1200/600",
+      "imageHint": "medical data visualization"
+    }
+  ]
+}
